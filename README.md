@@ -9,8 +9,8 @@ using numerical schemes to approximate the real solution.
 For this work, we consider the transport equation:
 <center>\[ \frac{\partial u}{\partial t} + c \cdot \nabla \u = f \]</center>
 
-
-
+**The Cauchy-Schwarz Inequality**
+$$\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)$$
 
 ### Contents
 This project is divided in six files
