@@ -7,9 +7,8 @@ This project aims to model the transport of a chemical species in a fluid, in 1D
 using numerical schemes to approximate the real solution.
 
 For this work, we consider the transport equation:
-<center>\[ \frac{\partial u}{\partial t} + c \cdot \nabla \u = f \]</center>
 
-
+$$\frac{\partial u}{\partial t} + c \cdot \nabla u = f$$
 
 
 ### Contents
@@ -22,4 +21,6 @@ This project is divided in six files
 - Display.py plots graphs and animations of the solutions found
 - Main.py calls functions from the previous files
 
+### Results
+The directory *output* contains plotted graphs and animations for both 1D and 2D case.
 
