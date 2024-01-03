@@ -7,9 +7,9 @@ This project aims to model the transport of a chemical species in a fluid, in 1D
 using numerical schemes to approximate the real solution.
 
 For this work, we consider the transport equation:
-<center>$$\frac{\partial u}{\partial t} + c \cdot \nabla u = f$$</center>
+<center></center>
 
-
+$$\frac{\partial u}{\partial t} + c \cdot \nabla u = f$$
 
 ### Contents
 This project is divided in six files
