@@ -45,6 +45,12 @@ def plot_wiener(p: np.ndarray[float], mu: float, sigma2: float) -> None:
 
 
 def animate_wiener(p: np.ndarray, mu: float, sigma2: float) -> None:
+    """
+    Animation of the brownian movement
+    :param p: Matrix containing the brownian motion
+    :param mu: Mean
+    :param sigma2: Variance
+    """
     fig, ax = plt.subplots()
     cmap = matplotlib.cm.winter
     colors = np.linalg.norm(p, axis=1)
