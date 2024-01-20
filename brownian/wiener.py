@@ -18,10 +18,10 @@ def wiener_process(mu: float, sigma2: float, nb_iter: int, x0: float = 0.0, y0: 
     random_dsp = np.random.normal(loc=mu, scale=sigma2, size=(nb_iter - 1, 2))
 
     # Matrix containing the position of the particle at each step
-    p = np.zeros((nb_iter, 2))
-    p[0, :] = [x0, y0]
+    p = np.vstack(([x0, y0], random_dsp))
+
     # We do the cumulative sum to know how the position of the particle evolves
-    p[1:] = np.cumsum(p[1:] + random_dsp, axis=0, dtype=float)
+    p = np.cumsum(p, axis=0, dtype=float)
 
     return p
 
