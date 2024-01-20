@@ -23,4 +23,3 @@ This project is divided in six files
 
 ### Results
 The directory *output* contains plotted graphs and animations for both 1D and 2D case.
-

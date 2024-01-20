@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.integrate import dblquad, tplquad, quad
 
 
 def u0_1d(x: float) -> float:

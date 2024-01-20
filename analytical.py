@@ -18,14 +18,24 @@ def u_1d(t: float, x: float) -> float:
 u_1d_vec = np.vectorize(u_1d, otypes=[float])
 
 
-def get_analytical_solution_1d() -> np.ndarray:
+def get_analytical_solution_1d(size: str) -> np.ndarray:
     """
+    :param size: 'same' for nx = nx or 'accurate' for nx = 10 * nx
     :return: The analytical solution for 1D case as U,
         matrix of shape (Nt, Nx) containing all the values for each time step
     """
-    x = np.linspace(0, length, 10 * nx)
+    if size not in ['same', 'accurate']:
+        raise Exception('Size must be "accurate" or "same"')
 
-    u_mat = np.zeros((nt, 10 * nx))
+    n = 0
+    if size == 'same':
+        n = nx
+    if size == 'accurate':
+        n = 10 * nx
+
+    x = np.linspace(0, length, n)
+
+    u_mat = np.zeros((nt, n))
     u_mat[0] = u0_1d_vec(x)
 
     for n in range(nt - 1):
