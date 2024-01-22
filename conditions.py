@@ -1,81 +1,144 @@
 import numpy as np
+from typing import Callable
 
 
-def u0_1d(x: float) -> float:
+def test_case_1d(test_id: int) -> tuple[Callable, ...]:
     """
-    :param x: Position
-    :return: Value of u when x - ct > 0
+    Define test cases for 1D
+
+    u0: Value when x - ct > 0
+
+    g: Value when x - ct < 0
+
+    f: Source term
+
+    :param test_id: Test case's id
+    :return: Functions used for the test
     """
-    return x
+    def test_case_1() -> tuple[Callable, ...]:
+        def u0(x: float) -> float:
+            return x
+
+        def g(t: float) -> float:
+            return np.sin(5 * np.pi * t)
+
+        def f(t: float, x: float) -> float:
+            return 0
+
+        return u0, g, f
+
+    def test_case_2() -> tuple[Callable, ...]:
+        def u0(x: float) -> float:
+            return np.exp(-x**2)
+
+        def g(t: float) -> float:
+            return np.sin(5 * np.pi * t)
+
+        def f(t: float, x: float) -> float:
+            return 0
+
+        return u0, g, f
+
+    def test_case_3() -> tuple[Callable, ...]:
+        def u0(x: float) -> float:
+            return np.exp(-x**2)
+
+        def g(t: float) -> float:
+            return 4 * np.abs(np.sin(5 * np.pi * t))
+
+        def f(t: float, x: float) -> float:
+            return 2
+
+        return u0, g, f
+
+    def test_case_4() -> tuple[Callable, ...]:
+        def u0(x: float) -> float:
+            return x
+
+        def g(t: float) -> float:
+            return 4 * np.abs(np.sin(8 * np.pi * t))
+
+        def f(t: float, x: float) -> float:
+            return 2
+
+        return u0, g, f
+
+    test_cases = {1: test_case_1(),
+                  2: test_case_2(),
+                  3: test_case_3(),
+                  4: test_case_4()}
+
+    if test_id in test_cases.keys():
+        return test_cases.get(test_id)
+    raise KeyError(f'No such test case: {test_id}')
 
 
-u0_1d_vec = np.vectorize(u0_1d, otypes=[float])
-
-
-def g_1d(t: float) -> float:
+def vectorize_test_case(test_case: tuple[Callable, ...]) -> tuple[Callable, ...]:
     """
-    :param t: Time
-    :return: Value of u when x - ct < 0
+    :param test_case: u0, g and f
+    :return: Vectorized version of the test case functions
     """
-    return 4 * np.abs(np.sin(8 * np.pi * t))
+    u0, g, f = test_case
+    u0_vec = np.vectorize(u0, otypes=[float])
+    g_vec = np.vectorize(g, otypes=[float])
+    f_vec = np.vectorize(f, otypes=[float])
+
+    return u0_vec, g_vec, f_vec
 
 
-g_1d_vec = np.vectorize(g_1d, otypes=[float])
-
-
-def f_1d(t: float, x: float) -> float:
+def test_case_2d(test_id: int) -> tuple[Callable, ...]:
     """
-    :param t: Time
-    :param x: Position
-    :return: Return the right-hand side of the equation for the time and position given
+    Define test cases for 2D
+
+    u0: Value when ||(x,y)||² - ct > 0
+
+    g: Value when ||(x,y)||² - ct - ct < 0
+
+    f: Source term
+
+    :param test_id: Test case's id
+    :return: Functions used for the test
     """
-    return 2
+    def test_case_1() -> tuple[Callable, ...]:
+        def u0(x: float, y: float) -> float:
+            return x + y
 
+        def g(t: float) -> float:
+            return np.sin(5 * np.pi * t)
 
-f_1d_vec = np.vectorize(f_1d, otypes=[float])
+        def f(t: float, x: float, y: float):
+            return 0
 
+        return u0, g, f
 
-def f_1d_integral(t: float, x: float) -> float:
-    """
-    :param t: Time
-    :param x: Position
-    :return: Return the integral of f from [0,t] [0,x]
-    """
-    return f_1d(t, x) * t
+    def test_case_2() -> tuple[Callable, ...]:
+        def u0(x: float, y: float) -> float:
+            return np.exp(-x**2 - y**2)
 
+        def g(t: float) -> float:
+            return np.sin(5 * np.pi * t)
 
-def u0_2d(x: float | np.ndarray, y: float | np.ndarray) -> float | np.ndarray:
-    """
-    :param x: Position on x-axis
-    :param y: Position on y-axis
-    :return: Value of u when (||(x,y)||_2)² > ct
-    """
-    return x + y
+        def f(t: float, x: float, y: float):
+            return 0
 
+        return u0, g, f
 
-def g_2d(t: float) -> float:
-    """
-    :param t: Time
-    :return: Value of u when (||(x,y)||_2)² > ct
-    """
-    return np.sin(5 * np.pi * t)
+    def test_case_3() -> tuple[Callable, ...]:
+        def u0(x: float, y: float) -> float:
+            return np.exp(-x**2 - y**2)
 
+        def g(t: float) -> float:
+            return 4 * np.abs(np.sin(5 * np.pi * t))
 
-def f_2d(t: float, x: float | np.ndarray, y: float | np.ndarray) -> float | np.ndarray:
-    """
-    :param t: Time
-    :param x: Position on x-axis
-    :param y: Position on y-axis
-    :return: Source term in 2D
-    """
-    return 0
+        def f(t: float, x: float, y: float):
+            return 2
 
+        return u0, g, f
 
-def f_2d_integral(t: float, x: float | np.ndarray, y: float | np.ndarray) -> float | np.ndarray:
-    """
-    :param t: Time
-    :param x: Position on x-axis
-    :param y: Position on y-axis
-    :return: Return the integral of f from [0,t] [0,x] [0,y]
-    """
-    return f_2d(t, x, y) * t
+    test_cases = {1: test_case_1(),
+                  2: test_case_2(),
+                  3: test_case_3()}
+
+    if test_id in test_cases.keys():
+        return test_cases.get(test_id)
+    raise KeyError(f'No such test case: {test_id}')

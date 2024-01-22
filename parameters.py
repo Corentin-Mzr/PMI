@@ -2,11 +2,12 @@
 
 length: float = 1.0  # Length of the spatial domain
 tf: float = 1.0  # Total time of the simulation
-c: float = 4.0  # Velocity
+c: float = 3.0  # Velocity
 nx: int = 100  # Number of points in the 1D space (and also 2d space)
-nt: int = int(c * nx)  # Number of time iterations
+nt: int = int(2 * c * nx)  # Number of time iterations
 dx: float = length / (nx - 1)  # Space step (for x and y axes)
 dt: float = tf / nt  # Time step
+h: float = 3.0  # Volatility
 
 
 def check_cfl(dim: int) -> None:

@@ -1,26 +1,14 @@
 import numpy as np
+from typing import Callable
 from parameters import c, length, nx, nt, dt
-from conditions import u0_1d, g_1d, u0_1d_vec, f_1d_integral, u0_2d, g_2d, f_2d_integral
 
 
-def u_1d(t: float, x: float) -> float:
-    """
-    :param t: Time
-    :param x: Position
-    :return: Value of u at the time and position given
-    """
-    if x - c * t > 0:
-        return u0_1d(x - c * t) + f_1d_integral(t, x)
-    else:
-        return g_1d(t - x / c)
-
-
-u_1d_vec = np.vectorize(u_1d, otypes=[float])
-
-
-def get_analytical_solution_1d(size: str) -> np.ndarray:
+def get_analytical_solution_1d(size: str, u0: Callable, g: Callable, f: Callable) -> np.ndarray:
     """
     :param size: 'same' for nx = nx or 'accurate' for nx = 10 * nx
+    :param u0:
+    :param g:
+    :param f:
     :return: The analytical solution for 1D case as U,
         matrix of shape (Nt, Nx) containing all the values for each time step
     """
@@ -32,30 +20,26 @@ def get_analytical_solution_1d(size: str) -> np.ndarray:
         n = nx
     if size == 'accurate':
         n = 10 * nx
-
     x = np.linspace(0, length, n)
 
-    u_mat = np.zeros((nt, n))
-    u_mat[0] = u0_1d_vec(x)
+    def u_1d(t: float) -> np.ndarray:
+        """
+        :param t: Time
+        :return: Value of u everywhere on the 1d space at the time given
+        """
+        return np.where(x - c * t > 0, u0(x - c * t) + f(t, x) * t, g(t - x / c))
 
+    u_mat = np.zeros((nt, n))
+    u_mat[0] = np.vectorize(u0, otypes=[float])(x)
+
+    # Compute solution at each time step
     for n in range(nt - 1):
-        u_mat[n + 1] = u_1d_vec((n + 1) * dt, x)
+        u_mat[n + 1] = u_1d((n + 1) * dt)
 
     return u_mat
 
 
-def u_2d(t: float, x: np.ndarray, y: np.ndarray) -> np.ndarray:
-    """
-    :param t: Time
-    :param x: Position on x-axis
-    :param y: Position on y-axis
-    :return: Value of u at the time and position given
-    """
-    d = x ** 2 + y ** 2
-    return np.where(d - c * t > 0, u0_2d(x, y) + f_2d_integral(t, x, y), g_2d(t - d / c))
-
-
-def get_analytical_solution_2d() -> np.ndarray:
+def get_analytical_solution_2d(u0: Callable, g: Callable, f: Callable) -> np.ndarray:
     """
     :return: The analytical solution for 2d case as U,
         matrix of shape (Nx, Ny, Nt) containing all the values for each time step
@@ -64,10 +48,19 @@ def get_analytical_solution_2d() -> np.ndarray:
     y = np.linspace(0, length, nx)
     x_grid, y_grid = np.meshgrid(x, y)
 
-    u_mat = np.zeros((nx, nx, nt))
-    u_mat[:, :, 0] = u0_2d(x_grid, y_grid)
+    def u_2d(t: float) -> np.ndarray:
+        """
+        :param t: Time
+        :return: Value of u everywhere in space at the time given
+        """
+        d = x_grid ** 2 + y_grid ** 2
+        return np.where(d - c * t > 0, u0(x_grid - c * t, y_grid - c * t) + f(t, x_grid, y_grid) * t, g(t - d / c))
 
+    u_mat = np.zeros((nx, nx, nt))
+    u_mat[:, :, 0] = u0(x_grid, y_grid)
+
+    # Compute solution at each time step
     for n in range(nt - 1):
-        u_mat[:, :, n + 1] = u_2d(dt * (n + 1), x_grid, y_grid)
+        u_mat[:, :, n + 1] = u_2d(dt * (n + 1))
 
     return u_mat
