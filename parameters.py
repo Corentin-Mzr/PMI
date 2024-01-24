@@ -1,7 +1,7 @@
 # All physical parameters for the discretization
 
-length: float = 1.0  # Length of the spatial domain
-tf: float = 1.0  # Total time of the simulation
+length: float = 5.0  # Length of the spatial domain
+tf: float = 5.0  # Total time of the simulation
 c: float = 3.0  # Velocity
 nx: int = 100  # Number of points in the 1D space (and also 2d space)
 nt: int = int(2 * c * nx)  # Number of time iterations

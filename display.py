@@ -209,8 +209,7 @@ def save_animation_2d(u_list: list[np.ndarray], title_list: list[str], path: str
         for k in range(len(u_list)):
             ax[k].cla()
             ax[k].imshow(u_list[k][:, :, i], vmin=vmin, vmax=vmax, extent=(0, length, 0, length), origin='lower')
-            ax[k].set_title(f"{title_list[k]}\nt={i * dt:.2f}s "
-                            f"| Mean : {np.mean(u_list[k][:, :, i]) if np.mean(u_list[k][:, :, i]) < vmax else 'inf':.2f}")
+            ax[k].set_title(f"{title_list[k]}\nt={i * dt:.2f}s | Mean : {min(np.mean(u_list[k][:, :, i]), 999):.2f}")
             ax[k].set_aspect('equal', 'box')
             plt.tight_layout()
 
