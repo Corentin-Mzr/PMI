@@ -1,5 +1,6 @@
 import numpy as np
 from typing import Callable
+from parameters import dt, length
 
 
 def test_case_1d(test_id: int) -> tuple[Callable, ...]:
@@ -63,10 +64,23 @@ def test_case_1d(test_id: int) -> tuple[Callable, ...]:
 
         return u0, g, f
 
+    def test_case_5() -> tuple[Callable, ...]:
+        def u0(x: float) -> float:
+            return x
+
+        def g(t: float) -> float:
+            return 4 * np.abs(np.sin(8 * np.pi * t))
+
+        def f(t: float, x: float) -> float:
+            return 2
+
+        return u0, g, f
+
     test_cases = {1: test_case_1(),
                   2: test_case_2(),
                   3: test_case_3(),
-                  4: test_case_4()}
+                  4: test_case_4(),
+                  5: test_case_5()}
 
     if test_id in test_cases.keys():
         return test_cases.get(test_id)
@@ -106,7 +120,7 @@ def test_case_2d(test_id: int) -> tuple[Callable, ...]:
         def g(t: float) -> float:
             return np.sin(5 * np.pi * t)
 
-        def f(t: float, x: float, y: float):
+        def f(t: float, x: float, y: float) -> float:
             return 0
 
         return u0, g, f
@@ -118,7 +132,7 @@ def test_case_2d(test_id: int) -> tuple[Callable, ...]:
         def g(t: float) -> float:
             return np.sin(5 * np.pi * t)
 
-        def f(t: float, x: float, y: float):
+        def f(t: float, x: float, y: float) -> float:
             return 0
 
         return u0, g, f
@@ -130,14 +144,27 @@ def test_case_2d(test_id: int) -> tuple[Callable, ...]:
         def g(t: float) -> float:
             return 4 * np.abs(np.sin(5 * np.pi * t))
 
-        def f(t: float, x: float, y: float):
+        def f(t: float, x: float, y: float) -> float:
             return 2
+
+        return u0, g, f
+
+    def test_case_4() -> tuple[Callable, ...]:
+        def u0(x: float, y: float) -> float:
+            return 0
+
+        def g(t: float) -> float | np.ndarray:
+            return np.where(t < 2 * dt, np.abs(np.sin(10 * np.pi * t)), 0)
+
+        def f(t: float, x: float, y: float) -> float:
+            return 0
 
         return u0, g, f
 
     test_cases = {1: test_case_1(),
                   2: test_case_2(),
-                  3: test_case_3()}
+                  3: test_case_3(),
+                  4: test_case_4()}
 
     if test_id in test_cases.keys():
         return test_cases.get(test_id)

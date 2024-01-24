@@ -108,7 +108,6 @@ def get_numerical_solution_2d(method: str, u0: Callable, g: Callable, f: Callabl
     # Initialization of the matrix
     u = np.zeros((nx, nx, nt))
     u[:, :, 0] = u0(x_grid, y_grid)
-    u[:, :, 0] = apply_boundary(u[:, :, 0])
 
     if method == 'rk4':
         def equation(t: float, un: np.ndarray) -> np.ndarray:
@@ -140,9 +139,6 @@ def get_numerical_solution_2d(method: str, u0: Callable, g: Callable, f: Callabl
             i, j = np.where(d - c * (n + 1) * dt < 0)
             dij = (dx * i) ** 2 + (dx * j) ** 2
             u[i.tolist(), j.tolist(), n + 1] = g((n + 1) * dt - dij / c)
-
-            # Boundary conditions
-            u[:, :, n + 1] = apply_boundary(u[:, :, n + 1])
 
     if 'fdm' in method:
         func = None
@@ -192,19 +188,20 @@ def get_numerical_solution_2d(method: str, u0: Callable, g: Callable, f: Callabl
             dij = (dx * i) ** 2 + (dx * j) ** 2
             u[i.tolist(), j.tolist(), n + 1] = g((n + 1) * dt - dij / c)
 
-            # Boundary conditions
-            u[:, :, n + 1] = apply_boundary(u[:, :, n + 1])
-
     if method == "euler-maruyama":
         # Define randomness
         dw = np.random.normal(loc=0.0, scale=dt, size=(nx, nx, nt))
 
         def grad_dx(mat: np.ndarray) -> np.ndarray:
-            return mat - np.roll(mat, 1, axis=1)
+            du_dx = mat - np.roll(mat, 1, axis=1)
+            du_dx = apply_boundary(du_dx)
+            return du_dx
 
         # u_i,j - u_i,j-1
         def grad_dy(mat: np.ndarray) -> np.ndarray:
-            return mat - np.roll(mat, 1, axis=0)
+            du_dy = mat - np.roll(mat, 1, axis=0)
+            du_dy = apply_boundary(du_dy)
+            return du_dy
 
         def upwind(mat: np.ndarray) -> np.ndarray:
             return grad_dx(mat) + grad_dy(mat)
@@ -222,5 +219,25 @@ def get_numerical_solution_2d(method: str, u0: Callable, g: Callable, f: Callabl
 
             # Boundary conditions
             u[:, :, n + 1] = apply_boundary(u[:, :, n + 1])
+
+    return u
+
+
+def oil_in_water(u0_vec: Callable, g: Callable, f: Callable, v:float=1.12 * 1e-8) -> np.ndarray:
+    x = np.linspace(0, length, nx)
+    u = np.zeros((nt, nx))
+    u[0] = u0_vec(x)
+
+    for n in range(nt - 1):
+        for i in range(nx):
+            if i * dx - c * (n + 1) * dt < 0:
+                u[n + 1, i] = g((n + 1) * dt - i * dx / c)
+            else:
+                uim1 = u[n, i - 1] if i > 0 else 0
+                uip1 = u[n, i + 1] if i < nx - 1 else 0
+                u[n + 1, i] = (u[n, i]
+                               + c * dt / dx * (uim1 - u[n, i])
+                               + v * dt / (dx**2) * (uim1 - 2 * u[n, i] + uip1)
+                               + dt * f(n * dt, i * dx))
 
     return u
